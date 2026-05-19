@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>My Cat Gatekeeper — Settings</title>
+  <title>Nika Keeper — Settings</title>
   <link rel="stylesheet" href="styles/options.css" />
 </head>
 <body>
   <div class="page">
     <header class="header">
       <div class="header-title">
-        <div class="logo"></div>
-        <div>
-          <h1>My Cat Gatekeeper</h1>
-          <p class="subtitle">Your cat guards your screen time.</p>
+        <div class="logo">
+          <img src="assets/icon1.png" alt="Nika icon" />
+        </div>
+        <div class="title-block">
+          <h1>Nika Keeper</h1>
+          <p class="subtitle">Your cat guards your time!</p>
         </div>
       </div>
 
-      <label class="switch">
+      <label class="switch" aria-label="Enable Nika Keeper">
         <input type="checkbox" id="isEnabled" />
         <span class="slider"></span>
       </label>
@@ -29,9 +31,9 @@
           <input
             type="number"
             id="limitMinutes"
-            min="5"
+            min="1"
             max="480"
-            step="5"
+            step="1"
           />
           <span class="suffix">min</span>
         </div>
@@ -51,8 +53,17 @@
         </div>
       </div>
 
-      <button id="saveButton" class="primary">Save</button>
-      <div id="status" class="status"></div>
+      <button id="saveButton" class="primary" type="button">Save</button>
+
+      <!-- <button id="testCatButton" class="secondary" type="button">Test Cat</button> -->
+
+      <div
+        id="status"
+        class="status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
     </section>
   </div>
 

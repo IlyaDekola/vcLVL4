@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Nika_Keeper",
+  "name": "Nika Keeper",
   "description": "Ника блокирует все сайты после N минут в браузере и устраивает вам перерыв.",
-  "version": "1.0.0",
+  "version": "1.0.1",
 
   "icons": {
     "16": "assets/icon16.png",
@@ -17,7 +17,9 @@
 
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "alarms",
+    "scripting"
   ],
 
   "host_permissions": [
@@ -32,9 +34,17 @@
     }
   ],
 
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
   "options_page": "options.html",
 
   "action": {
-    "default_title": "Nika Keeper"
+    "default_title": "Nika Keeper",
+    "default_popup": "options.html"
   }
 }
