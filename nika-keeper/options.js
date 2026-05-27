@@ -33,6 +33,23 @@ async function init() {
   els.limitMinutes.value = String(settings?.limitMinutes ?? 60);
   els.breakMinutes.value = String(settings?.breakMinutes ?? 5);
 
+  els.isEnabled.addEventListener("change", async () => {
+    try {
+      await saveSettings({
+        isEnabled: els.isEnabled.checked
+      });
+
+      showStatus(
+        els,
+        els.isEnabled.checked ? "Nika enabled ✅" : "Nika disabled ✅",
+        false
+      );
+    } catch (error) {
+      console.error("Failed to update enabled state:", error);
+      showStatus(els, "Could not update Nika state.", true);
+    }
+  });
+
   els.saveButton.addEventListener("click", async () => {
     await onSave(els);
   });
@@ -94,7 +111,8 @@ function showStatus(els, message, isError) {
   els.status.textContent = message;
   els.status.style.color = isError ? "#d64545" : "#2f7c4c";
 
-  setTimeout(() => {
+  clearTimeout(showStatus._timer);
+  showStatus._timer = setTimeout(() => {
     if (els.status && els.status.textContent === message) {
       els.status.textContent = "";
     }

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Nika Keeper",
-  "description": "Ника блокирует все сайты после N минут в браузере и устраивает вам перерыв.",
-  "version": "1.0.1",
+  "description": "",
+  "version": "1.0.3",
 
   "icons": {
     "16": "assets/icon16.png",

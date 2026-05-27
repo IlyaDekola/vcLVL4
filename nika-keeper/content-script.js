@@ -1,5 +1,3 @@
-// content-script.js
-
 let overlayEl = null;
 let countdownId = null;
 let previousOverflow = "";
@@ -7,6 +5,7 @@ let currentBreakEndsAt = null;
 let catScaleWrapEl = null;
 let visualViewportResizeHandler = null;
 let windowResizeHandler = null;
+let isEnabled = true;
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "PING_CONTENT_SCRIPT") {
@@ -14,6 +13,7 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 
   if (message?.type === "SHOW_CAT_OVERLAY") {
+    if (!isEnabled) return;
     showCatOverlay(message.breakEndsAt);
   }
 
@@ -23,8 +23,51 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 initOverlayState();
+subscribeToStorageChanges();
 
 async function initOverlayState() {
+  try {
+    const [breakState, settings] = await Promise.all([
+      chrome.runtime.sendMessage({ type: "GET_BREAK_STATE" }),
+      chrome.storage.sync.get(["enabled"])
+    ]);
+
+    isEnabled = settings.enabled ?? true;
+
+    if (!isEnabled) {
+      hideCatOverlay(false);
+      return;
+    }
+
+    if (
+      breakState?.isOnBreak &&
+      typeof breakState.breakEndsAt === "number" &&
+      breakState.breakEndsAt > Date.now()
+    ) {
+      showCatOverlay(breakState.breakEndsAt);
+    }
+  } catch (error) {
+    console.warn("Failed to restore overlay state", error);
+  }
+}
+
+function subscribeToStorageChanges() {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "sync") return;
+    if (!changes.enabled) return;
+
+    isEnabled = changes.enabled.newValue ?? true;
+
+    if (!isEnabled) {
+      hideCatOverlay(false);
+      return;
+    }
+
+    restoreOverlayIfBreakIsActive();
+  });
+}
+
+async function restoreOverlayIfBreakIsActive() {
   try {
     const response = await chrome.runtime.sendMessage({ type: "GET_BREAK_STATE" });
 
@@ -34,13 +77,17 @@ async function initOverlayState() {
       response.breakEndsAt > Date.now()
     ) {
       showCatOverlay(response.breakEndsAt);
+    } else {
+      hideCatOverlay(false);
     }
   } catch (error) {
-    console.warn("Failed to restore overlay state", error);
+    console.warn("Failed to restore overlay after toggle", error);
   }
 }
 
 async function showCatOverlay(breakEndsAtFromMessage) {
+  if (!isEnabled) return;
+
   const effectiveBreakEndsAt =
     typeof breakEndsAtFromMessage === "number" ? breakEndsAtFromMessage : null;
 
